@@ -228,6 +228,9 @@ public class Controller2D : RaycastController {
     float elapsedTime = 0;
     Vector3 startingScale = transform.localScale;
     while (elapsedTime < seconds) {
+      if (scaleTo.x > startingScale.x && collisions.below) {
+        Move(Vector2.up * Time.deltaTime * (scaleTo - startingScale ) / 2);
+      }
       transform.localScale = Vector3.Lerp(startingScale, scaleTo, (elapsedTime / seconds));
       elapsedTime += Time.deltaTime;
       yield return new WaitForEndOfFrame();

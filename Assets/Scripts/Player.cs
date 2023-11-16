@@ -12,8 +12,6 @@ public class Player : MonoBehaviour {
   [SerializeField] private float timeToJumpApex = .3f;
   [SerializeField] private float accelerationTimeGrounded = 0.1f;
   [SerializeField] private float accelerationTimeAirborne = 0.05f;
-  [SerializeField] private float minScale = 1;
-  [SerializeField] private float maxScale = 16;
   [SerializeField] private float scaleTime = 0.3f;
   [SerializeField] private GameObject[] virtualCameras;
   
@@ -27,12 +25,17 @@ public class Player : MonoBehaviour {
   private float maxJumpVelocity;
   private float minJumpVelocity;
   private int vCamIndex = 0;
-  private int growFactor = 4;
+  private int scaleLevel;
+  private float maxScaleLevel = 2;
+  private int scaleFactor = 4;
+  private bool scalingInProgress = false;
 
   void Start() {
     controller = GetComponent<Controller2D>();
     calculateJumpPhysics();
     SwitchVCam(0);
+    scaleLevel = 0;
+    scalingInProgress = false;
   }
 
   void Update() {
@@ -80,13 +83,15 @@ public class Player : MonoBehaviour {
   }
 
   public void OnGrow() {
-    if (transform.localScale.x < maxScale) {
-      float targetScale = transform.localScale.y * growFactor;
+    if (scaleLevel < maxScaleLevel && !scalingInProgress) {
+      scaleLevel++;
+      float targetScale = Mathf.Pow(scaleFactor, scaleLevel);
+      StartCoroutine(MarkScalingInProgress());
       controller.Scale(new Vector3(targetScale, targetScale, 1), scaleTime);
       
-      maxJumpHeight *= growFactor;
-      minJumpHeight *= growFactor;
-      moveSpeed *= growFactor;
+      maxJumpHeight *= scaleFactor;
+      minJumpHeight *= scaleFactor;
+      moveSpeed *= scaleFactor;
       calculateJumpPhysics();
       vCamIndex++;
       SwitchVCam(vCamIndex);
@@ -94,9 +99,11 @@ public class Player : MonoBehaviour {
   }
 
   public void OnShrink() {
-    if (transform.localScale.x > minScale) {
-      float factor = 1f / growFactor;
-      float targetScale = transform.localScale.y * factor;
+    if (scaleLevel > 0 && !scalingInProgress) {
+      scaleLevel--;
+      float factor = 1f / scaleFactor;
+      float targetScale = Mathf.Pow(scaleFactor, scaleLevel);
+      StartCoroutine(MarkScalingInProgress());
       controller.Scale(new Vector3(targetScale, targetScale, 1), scaleTime);
       maxJumpHeight *= factor;
       minJumpHeight *= factor;
@@ -107,6 +114,13 @@ public class Player : MonoBehaviour {
     }
   }
 
+  IEnumerator MarkScalingInProgress()
+  {
+    scalingInProgress = true;
+    yield return new WaitForSeconds(scaleTime);
+    scalingInProgress = false;
+  }
+  
   private void SwitchVCam(int index) {
     for (int i = 0; i < virtualCameras.Length; i++) {
       virtualCameras[i].SetActive(index == i);
