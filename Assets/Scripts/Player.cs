@@ -29,6 +29,7 @@ public class Player : MonoBehaviour {
   private float maxScaleLevel = 2;
   private int scaleFactor = 4;
   private bool scalingInProgress = false;
+  private Rigidbody2D rb;
 
   void Start() {
     controller = GetComponent<Controller2D>();
@@ -61,7 +62,7 @@ public class Player : MonoBehaviour {
 
   void CalculateVelocity() {
     float targetVelocityX = directionalInput.x * moveSpeed;
-    velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing,
+    velocity.x = scalingInProgress ? 0 : Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing,
       controller.collisions.below ? accelerationTimeGrounded : accelerationTimeAirborne);
     velocity.y += gravity * Time.deltaTime;
   }
@@ -114,8 +115,7 @@ public class Player : MonoBehaviour {
     }
   }
 
-  IEnumerator MarkScalingInProgress()
-  {
+  IEnumerator MarkScalingInProgress() {
     scalingInProgress = true;
     yield return new WaitForSeconds(scaleTime);
     scalingInProgress = false;
@@ -126,6 +126,4 @@ public class Player : MonoBehaviour {
       virtualCameras[i].SetActive(index == i);
     }
   }
-  
-
 }
