@@ -31,7 +31,6 @@ public class Player : MonoBehaviour {
   private float _minJumpVelocity;
   private float _accelerationTimeAirborne = .1f;
   private float _accelerationTimeGrounded = .04f;  
-  private bool _grounded;
   private bool _isSmall;
   private float _velocityXSmoothing;
 
@@ -50,7 +49,7 @@ public class Player : MonoBehaviour {
   private void FixedUpdate() {
     transform.rotation = Quaternion.identity;
     float velocityX = Mathf.SmoothDamp(_rb.velocity.x, movementInput.x * _speed, ref _velocityXSmoothing, 
-      _grounded ? _accelerationTimeGrounded : _accelerationTimeAirborne);
+      _raycastController.collisions.Below ? _accelerationTimeGrounded : _accelerationTimeAirborne);
     _rb.velocity = new Vector2(velocityX, _rb.velocity.y);
   }
 
@@ -107,7 +106,7 @@ public class Player : MonoBehaviour {
       // }
       float scaleDifference = scaleTo.x - startingScale.x;
       Vector2 vel = Vector2.zero;
-      if (gettingLarger && _grounded) {
+      if (gettingLarger && _raycastController.collisions.Below) {
         vel += Vector2.up * (Time.deltaTime * scaleDifference);
       }
       _rb.velocity = vel;
