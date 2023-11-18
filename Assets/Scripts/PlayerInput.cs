@@ -21,6 +21,8 @@ public class PlayerInput : MonoBehaviour {
     _input.Player.Movement.canceled += OnMovementCanceled;
     _input.Player.Jump.performed += OnJumpPerformed;
     _input.Player.Jump.canceled += OnJumpCanceled;
+    _input.Player.Grow.performed += OnGrowPerformed;
+    _input.Player.Shrink.performed += OnShrinkPerformed;
   }
 
   private void OnDisable() {
@@ -34,7 +36,6 @@ public class PlayerInput : MonoBehaviour {
   private void OnMovementPerformed(InputAction.CallbackContext value) {
     _player.movementInput = value.ReadValue<Vector2>();
   }
-
   private void OnMovementCanceled(InputAction.CallbackContext value) {
     _player.movementInput = Vector2.zero;
   }
@@ -42,8 +43,15 @@ public class PlayerInput : MonoBehaviour {
   private void OnJumpPerformed(InputAction.CallbackContext _) {
     _player.OnJumpPerformed();
   }
-  
   private void OnJumpCanceled(InputAction.CallbackContext _) {
     _player.OnJumpCanceled();
+  }
+
+  private void OnGrowPerformed(InputAction.CallbackContext _) {
+    _player.OnGrowPerformed();
+  }
+
+  private void OnShrinkPerformed(InputAction.CallbackContext _) {
+    _player.OnShrinkPerformed();
   }
 }

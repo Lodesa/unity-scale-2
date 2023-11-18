@@ -62,15 +62,6 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""Movement2"",
-                    ""type"": ""Button"",
-                    ""id"": ""b8c98e90-9e95-4a15-b02d-0f3b78de90e1"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -240,6 +231,61 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": true
                 },
                 {
+                    ""name"": ""DPad"",
+                    ""id"": ""ebbd70b5-9650-4358-ac76-4c3d06958453"",
+                    ""path"": ""2DVector(mode=1)"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Movement"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""8793ad03-9bab-48c9-a67d-bb79c16c21a5"",
+                    ""path"": ""<Gamepad>/dpad/up"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Movement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""down"",
+                    ""id"": ""83f9961b-c67d-4dbd-a543-5c0cfb37e12f"",
+                    ""path"": ""<Gamepad>/dpad/down"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Movement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""7629c8ae-337a-4706-8773-60cb531dc64e"",
+                    ""path"": ""<Gamepad>/dpad/left"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Movement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""69de0214-01e2-47b3-82ad-bbdf3a3b8f9e"",
+                    ""path"": ""<Gamepad>/dpad/right"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Movement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
                     ""name"": """",
                     ""id"": ""cf393132-77c4-4864-84a4-250a1b321393"",
                     ""path"": ""<Keyboard>/space"",
@@ -304,39 +350,6 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
                     ""action"": ""Shrink"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""DPad"",
-                    ""id"": ""4acca57c-ab6c-4f40-8f29-5823d640804e"",
-                    ""path"": ""1DAxis"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Movement2"",
-                    ""isComposite"": true,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""negative"",
-                    ""id"": ""018bd86b-af7e-43b1-92f1-2e2b88bbca3e"",
-                    ""path"": ""<Gamepad>/dpad/left"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Movement2"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""positive"",
-                    ""id"": ""2ec4a2ee-bb7a-4159-bb0d-32ec4cd29c79"",
-                    ""path"": ""<Gamepad>/dpad/right"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Movement2"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
                 }
             ]
         }
@@ -349,7 +362,6 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Grow = m_Player.FindAction("Grow", throwIfNotFound: true);
         m_Player_Shrink = m_Player.FindAction("Shrink", throwIfNotFound: true);
-        m_Player_Movement2 = m_Player.FindAction("Movement2", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -415,7 +427,6 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_Grow;
     private readonly InputAction m_Player_Shrink;
-    private readonly InputAction m_Player_Movement2;
     public struct PlayerActions
     {
         private @CustomInput m_Wrapper;
@@ -424,7 +435,6 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
         public InputAction @Grow => m_Wrapper.m_Player_Grow;
         public InputAction @Shrink => m_Wrapper.m_Player_Shrink;
-        public InputAction @Movement2 => m_Wrapper.m_Player_Movement2;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -446,9 +456,6 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
             @Shrink.started += instance.OnShrink;
             @Shrink.performed += instance.OnShrink;
             @Shrink.canceled += instance.OnShrink;
-            @Movement2.started += instance.OnMovement2;
-            @Movement2.performed += instance.OnMovement2;
-            @Movement2.canceled += instance.OnMovement2;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -465,9 +472,6 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
             @Shrink.started -= instance.OnShrink;
             @Shrink.performed -= instance.OnShrink;
             @Shrink.canceled -= instance.OnShrink;
-            @Movement2.started -= instance.OnMovement2;
-            @Movement2.performed -= instance.OnMovement2;
-            @Movement2.canceled -= instance.OnMovement2;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -491,6 +495,5 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
         void OnJump(InputAction.CallbackContext context);
         void OnGrow(InputAction.CallbackContext context);
         void OnShrink(InputAction.CallbackContext context);
-        void OnMovement2(InputAction.CallbackContext context);
     }
 }
