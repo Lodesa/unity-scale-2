@@ -4,23 +4,26 @@ using System.Collections;
 using UnityEngine.Serialization;
 
 [RequireComponent(typeof(BoxCollider2D))]
+[RequireComponent(typeof(Rigidbody2D))]
 public class RaycastController : MonoBehaviour {
   [FormerlySerializedAs("verticalRayCount")] [SerializeField] private int rayCount = 8;
   [SerializeField] private LayerMask collisionMask;
   [SerializeField] private float skinWidth = .015f;
 
-  private float _raySpacing;
   private BoxCollider2D _collider;
+  private Rigidbody2D _rb;
   private RaycastOrigins _raycastOrigins;
-  
   public Collisions collisions;
+  private float _raySpacing;
+  
 
   public virtual void Awake() {
     _collider = GetComponent<BoxCollider2D>();
+    _rb = GetComponent<Rigidbody2D>();
     collisions.Reset();
   }
 
-  private void FixedUpdate() {
+  private void Update() {
     GetCollisions();
   }
 
@@ -78,14 +81,18 @@ public class RaycastController : MonoBehaviour {
       }      
     }
     
-    print((collisions.Top?"1":"0") + (collisions.Right?"1":"0") + (collisions.Bottom?"1":"0") + (collisions.Left?"1":"0"));
+    collisions.pinchedVertically = collisions.Bottom && collisions.Top;
+    collisions.pinchedHorizontally = collisions.Left && collisions.Right;
+    collisions.pinched = collisions.pinchedVertically || collisions.pinchedHorizontally;
+    print((collisions.Top?"1":"0") + (collisions.Right?"1":"0") + (collisions.Bottom?"1":"0") + (collisions.Left?"1":"0") + (collisions.pinched?"-pinched":""));
+
   }
   
   public void CalculateRaySpacing() {
     Bounds bounds = _collider.bounds;
     bounds.Expand(skinWidth * -2);
-    _raycastOrigins.BottomLeft = new Vector2(bounds.min.x, bounds.min.y);
-    _raycastOrigins.TopRight = new Vector2(bounds.max.x, bounds.max.y);
+    _raycastOrigins.BottomLeft = new Vector2(bounds.min.x, bounds.min.y) + _rb.velocity * Time.deltaTime;
+    _raycastOrigins.TopRight = new Vector2(bounds.max.x, bounds.max.y)+ _rb.velocity * Time.deltaTime;
     _raySpacing = bounds.size.x / (rayCount - 1);
   }
 
@@ -94,7 +101,7 @@ public class RaycastController : MonoBehaviour {
   }
   
   public struct Collisions {
-    public bool Top, Right, Bottom, Left;
+    public bool Top, Right, Bottom, Left, pinchedHorizontally, pinchedVertically, pinched;
 
     public void Reset() {
       Top = false;
