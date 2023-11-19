@@ -49,12 +49,12 @@ public class Player : MonoBehaviour {
   private void FixedUpdate() {
     transform.rotation = Quaternion.identity;
     float velocityX = Mathf.SmoothDamp(_rb.velocity.x, movementInput.x * _speed, ref _velocityXSmoothing, 
-      _raycastController.collisions.Below ? _accelerationTimeGrounded : _accelerationTimeAirborne);
+      _raycastController.collisions.Bottom ? _accelerationTimeGrounded : _accelerationTimeAirborne);
     _rb.velocity = new Vector2(velocityX, _rb.velocity.y);
   }
 
   public void OnJumpPerformed() {
-    if (_raycastController.collisions.Below) {
+    if (_raycastController.collisions.Bottom) {
       _rb.velocity = new Vector2(_rb.velocity.x, _maxJumpVelocity);
     }
   }
@@ -106,7 +106,7 @@ public class Player : MonoBehaviour {
       // }
       float scaleDifference = scaleTo.x - startingScale.x;
       Vector2 vel = Vector2.zero;
-      if (gettingLarger && _raycastController.collisions.Below) {
+      if (gettingLarger && _raycastController.collisions.Bottom) {
         vel += Vector2.up * (Time.deltaTime * scaleDifference);
       }
       _rb.velocity = vel;

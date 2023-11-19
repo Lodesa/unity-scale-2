@@ -37,7 +37,7 @@ public class RaycastController : MonoBehaviour {
       RaycastHit2D hitBelow = Physics2D.Raycast(rayOriginBottom, Vector2.down, rayLength, collisionMask);
       Debug.DrawRay(rayOriginBottom, Vector2.down * rayLength, Color.red);
       if (hitBelow) {
-        collisions.Below = true;
+        collisions.Bottom = true;
         break;
       }
     }
@@ -49,7 +49,7 @@ public class RaycastController : MonoBehaviour {
       RaycastHit2D hitAbove = Physics2D.Raycast(rayOriginTop, Vector2.up, rayLength, collisionMask);
       Debug.DrawRay(rayOriginTop, Vector2.up * rayLength, Color.red);
       if (hitAbove) {
-        collisions.Above = true;
+        collisions.Top = true;
         break;
       }      
     }
@@ -78,7 +78,7 @@ public class RaycastController : MonoBehaviour {
       }      
     }
     
-    print("below: " + collisions.Below + ", above: " + collisions.Above + ", left: " + collisions.Left + ", right: " + collisions.Right);
+    print((collisions.Top?"1":"0") + (collisions.Right?"1":"0") + (collisions.Bottom?"1":"0") + (collisions.Left?"1":"0"));
   }
   
   public void CalculateRaySpacing() {
@@ -94,12 +94,12 @@ public class RaycastController : MonoBehaviour {
   }
   
   public struct Collisions {
-    public bool Above, Below, Right, Left;
+    public bool Top, Right, Bottom, Left;
 
     public void Reset() {
-      Above = false;
-      Below = false;
+      Top = false;
       Right = false;
+      Bottom = false;
       Left = false;
     }
   }
