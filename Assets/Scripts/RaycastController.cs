@@ -5,12 +5,11 @@ using UnityEngine.Serialization;
 
 [RequireComponent(typeof(BoxCollider2D))]
 public class RaycastController : MonoBehaviour {
-  [SerializeField] private int verticalRayCount = 8;
+  [FormerlySerializedAs("verticalRayCount")] [SerializeField] private int rayCount = 8;
   [SerializeField] private LayerMask collisionMask;
   [SerializeField] private float skinWidth = .015f;
 
-  private float _verticalRaySpacing;
-  private float _horizontalRaySpacing;
+  private float _raySpacing;
   private BoxCollider2D _collider;
   private RaycastOrigins _raycastOrigins;
   
@@ -22,50 +21,72 @@ public class RaycastController : MonoBehaviour {
   }
 
   private void FixedUpdate() {
-    VerticalCollisions();
+    GetCollisions();
   }
 
-  void VerticalCollisions() {
+  void GetCollisions() {
     CalculateRaySpacing();
+    collisions.Reset();
     float rayLength = skinWidth * 2;
-    bool below = false;
-    bool above = false;
+    
 
-    for (int i = 0; i < verticalRayCount; i++) {
-      // check below
+    // check below
+    for (int i = 0; i < rayCount; i++) {
       Vector2 rayOriginBottom = _raycastOrigins.BottomLeft;
-      rayOriginBottom += Vector2.right * (_verticalRaySpacing * i);
+      rayOriginBottom += Vector2.right * (_raySpacing * i);
       RaycastHit2D hitBelow = Physics2D.Raycast(rayOriginBottom, Vector2.down, rayLength, collisionMask);
       Debug.DrawRay(rayOriginBottom, Vector2.down * rayLength, Color.red);
       if (hitBelow) {
-        below = true;
+        collisions.Below = true;
         break;
       }
     }
-    collisions.Below = below;
 
     // check above
-    for (int i = 0; i < verticalRayCount; i++) {
+    for (int i = 0; i < rayCount; i++) {
       Vector2 rayOriginTop = _raycastOrigins.TopRight;
-      rayOriginTop += Vector2.left * (_verticalRaySpacing * i);
+      rayOriginTop += Vector2.left * (_raySpacing * i);
       RaycastHit2D hitAbove = Physics2D.Raycast(rayOriginTop, Vector2.up, rayLength, collisionMask);
       Debug.DrawRay(rayOriginTop, Vector2.up * rayLength, Color.red);
       if (hitAbove) {
-        above = true;
+        collisions.Above = true;
         break;
       }      
     }
-    collisions.Above = above;
     
-    print("below: " + collisions.Below + ", above: " + collisions.Above);
+    // check left
+    for (int i = 0; i < rayCount; i++) {
+      Vector2 rayOriginLeft = _raycastOrigins.BottomLeft;
+      rayOriginLeft += Vector2.up * (_raySpacing * i);
+      RaycastHit2D hitLeft = Physics2D.Raycast(rayOriginLeft, Vector2.left, rayLength, collisionMask);
+      Debug.DrawRay(rayOriginLeft, Vector2.left * rayLength, Color.red);
+      if (hitLeft) {
+        collisions.Left = true;
+        break;
+      }      
+    }
+    
+    // check right
+    for (int i = 0; i < rayCount; i++) {
+      Vector2 rayOriginRight = _raycastOrigins.TopRight;
+      rayOriginRight += Vector2.down * (_raySpacing * i);
+      RaycastHit2D hitRight = Physics2D.Raycast(rayOriginRight, Vector2.right, rayLength, collisionMask);
+      Debug.DrawRay(rayOriginRight, Vector2.right * rayLength, Color.red);
+      if (hitRight) {
+        collisions.Right = true;
+        break;
+      }      
+    }
+    
+    print("below: " + collisions.Below + ", above: " + collisions.Above + ", left: " + collisions.Left + ", right: " + collisions.Right);
   }
-
+  
   public void CalculateRaySpacing() {
     Bounds bounds = _collider.bounds;
     bounds.Expand(skinWidth * -2);
     _raycastOrigins.BottomLeft = new Vector2(bounds.min.x, bounds.min.y);
     _raycastOrigins.TopRight = new Vector2(bounds.max.x, bounds.max.y);
-    _verticalRaySpacing = bounds.size.x / (verticalRayCount - 1);
+    _raySpacing = bounds.size.x / (rayCount - 1);
   }
 
   public struct RaycastOrigins {
