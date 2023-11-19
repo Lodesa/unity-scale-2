@@ -9,9 +9,9 @@ using UnityEngine.Serialization;
 [RequireComponent(typeof(CameraController))]
 public class Player : MonoBehaviour {
 
-  [SerializeField]private float speedSmall = 6;
+  [SerializeField]private float speedSmall = 9;
   [SerializeField]private float speedLarge = 10;
-  [SerializeField]private float maxJumpVelocitySmall = 22;
+  [SerializeField]private float maxJumpVelocitySmall = 26;
   [SerializeField]private float maxJumpVelocityLarge = 40;
   [SerializeField]private float minJumpVelocitySmall = 5;
   [SerializeField]private float minJumpVelocityLarge = 10;
@@ -32,10 +32,11 @@ public class Player : MonoBehaviour {
   private float _minJumpVelocity;
   private float _accelerationTimeAirborne = .1f;
   private float _accelerationTimeGrounded = .04f;  
-  private bool _isSmall;
   private float _velocityXSmoothing;
-  private float _scaleSmoothing;
+  private bool _isSmall;
   private bool _isScaling;
+  private float _scaleSmoothing;
+  private float _initialGravityScale;
 
   void Awake() {
     _rb = GetComponent<Rigidbody2D>();
@@ -45,27 +46,38 @@ public class Player : MonoBehaviour {
     _speed = speedSmall;
     _maxJumpVelocity = maxJumpVelocitySmall;
     _minJumpVelocity = minJumpVelocitySmall;
+    _initialGravityScale = _rb.gravityScale;
   }
   
   void Start() { }
 
   private void FixedUpdate() {
-    transform.rotation = Quaternion.identity;
-    float velocityX = Mathf.SmoothDamp(_rb.velocity.x, movementInput.x * _speed, ref _velocityXSmoothing,
+    // movement
+    float velY = _rb.velocity.y;
+    float velX = Mathf.SmoothDamp(_rb.velocity.x, movementInput.x * _speed, ref _velocityXSmoothing,
       _raycastController.collisions.Bottom ? _accelerationTimeGrounded : _accelerationTimeAirborne);
-    _rb.velocity = _raycastController.collisions.pinched
-      ? Vector2.zero
-      : new Vector2(velocityX, _rb.velocity.y);
-    
+
+    // scaling
     if (_isScaling) {
-      if (!_isSmall && _raycastController.collisions.pinched) { }
-        
-      else {
+      if (!_raycastController.collisions.pinched || _isSmall) {
         float scale = Mathf.SmoothDamp(transform.localScale.x, _isSmall ? 1 : scaleFactor, ref _scaleSmoothing, scaleTime);
         transform.localScale = new Vector3(scale, scale, 1);
         _isScaling = !(transform.localScale.x >= scaleFactor);
       }
-    }    
+    }
+
+    if (!_isSmall) {
+      if (_raycastController.collisions.pinchedVertically) {
+        velX = 0;
+      }
+      if (_raycastController.collisions.pinchedHorizontally) {
+        velY = 0;
+      }
+    }
+
+    _rb.gravityScale = _raycastController.collisions.pinchedHorizontally ? 0 : _initialGravityScale;
+    _rb.velocity = new Vector2(velX, velY);    
+    transform.rotation = Quaternion.identity;
   }
 
   public void OnJumpPerformed() {
@@ -82,7 +94,6 @@ public class Player : MonoBehaviour {
 
   public void OnGrowPerformed() {
     if (_isSmall) {
-      // Scale(new Vector3(scaleFactor, scaleFactor, 1), 1);
       _cameraController.SwitchCamera(1);
       _maxJumpVelocity = maxJumpVelocityLarge;
       _minJumpVelocity = minJumpVelocityLarge;
@@ -96,7 +107,6 @@ public class Player : MonoBehaviour {
 
   public void OnShrinkPerformed() {
     if (!_isSmall) {
-      // Scale(Vector3.one, 0.15f);
       _cameraController.SwitchCamera(0);
       _maxJumpVelocity = maxJumpVelocitySmall;
       _minJumpVelocity = minJumpVelocitySmall;
