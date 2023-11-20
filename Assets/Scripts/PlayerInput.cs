@@ -23,6 +23,7 @@ public class PlayerInput : MonoBehaviour {
     _input.Player.Jump.canceled += OnJumpCanceled;
     _input.Player.Grow.performed += OnGrowPerformed;
     _input.Player.Shrink.performed += OnShrinkPerformed;
+    _input.Player.Dash.performed += OnDashPerformed;
   }
 
   private void OnDisable() {
@@ -54,4 +55,8 @@ public class PlayerInput : MonoBehaviour {
   private void OnShrinkPerformed(InputAction.CallbackContext _) {
     _player.OnShrinkPerformed();
   }
+  
+  private void OnDashPerformed(InputAction.CallbackContext _) {
+    _player.OnDashPerformed();
+  }  
 }

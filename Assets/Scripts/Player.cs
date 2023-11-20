@@ -21,6 +21,8 @@ public class Player : MonoBehaviour {
   [SerializeField]private float accelerationTimeGroundedLarge = .09f;
   [SerializeField]private int scaleFactor = 5;
   [SerializeField]private float scaleTime = 0.15f;
+  [SerializeField]private float dashTime = 0.5f;
+  [SerializeField]private float dashSpeed = 16;
   [SerializeField] private AudioSource audioJump;
   [SerializeField] private AudioSource audioLand;
   [SerializeField] private AudioSource audioScale;
@@ -42,6 +44,7 @@ public class Player : MonoBehaviour {
   private float _initialGravityScale;
   private float _prevVelY;
   private bool _prevGrounded;
+  private bool _isDashing;
 
   void Awake() {
     _rb = GetComponent<Rigidbody2D>();
@@ -59,7 +62,7 @@ public class Player : MonoBehaviour {
   private void FixedUpdate() {
     // movement
     float velY = _rb.velocity.y;
-    float velX = Mathf.SmoothDamp(_rb.velocity.x, movementInput.x * _speed, ref _velocityXSmoothing,
+    float velX = Mathf.SmoothDamp(_rb.velocity.x, movementInput.x * (_isDashing ? dashSpeed : _speed), ref _velocityXSmoothing,
       _raycastController.collisions.Bottom ? _accelerationTimeGrounded : _accelerationTimeAirborne);
 
     // scaling
@@ -94,7 +97,6 @@ public class Player : MonoBehaviour {
 
   public void OnJumpPerformed() {
     if (_raycastController.collisions.Bottom) {
-      audioJump.pitch = _isSmall ? 1.5f : 1.2f;
       audioJump.Play();
       _rb.velocity = new Vector2(_rb.velocity.x, _maxJumpVelocity);
     }
@@ -132,5 +134,17 @@ public class Player : MonoBehaviour {
       _accelerationTimeGrounded = accelerationTimeGroundedSmall;
       audioScale.Play();
     }
+  }
+
+  public void OnDashPerformed() {
+    if (!_isDashing && _isSmall && _raycastController.collisions.Bottom) {
+      StartCoroutine(Dash());
+    }
+  }
+  
+  IEnumerator Dash() {
+    _isDashing = true;
+    yield return new WaitForSeconds(dashTime);
+    _isDashing = false;
   }
 }
