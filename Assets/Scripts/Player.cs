@@ -21,6 +21,9 @@ public class Player : MonoBehaviour {
   [SerializeField]private float accelerationTimeGroundedLarge = .09f;
   [SerializeField]private int scaleFactor = 5;
   [SerializeField]private float scaleTime = 0.15f;
+  [SerializeField] private AudioSource audioJump;
+  [SerializeField] private AudioSource audioLand;
+  [SerializeField] private AudioSource audioScale;
   
   [HideInInspector]public Vector2 movementInput;
   
@@ -37,6 +40,8 @@ public class Player : MonoBehaviour {
   private bool _isScaling;
   private float _scaleSmoothing;
   private float _initialGravityScale;
+  private float _prevVelY;
+  private bool _prevGrounded;
 
   void Awake() {
     _rb = GetComponent<Rigidbody2D>();
@@ -78,10 +83,19 @@ public class Player : MonoBehaviour {
     _rb.gravityScale = _raycastController.collisions.pinchedHorizontally ? 0 : _initialGravityScale;
     _rb.velocity = new Vector2(velX, velY);    
     transform.rotation = Quaternion.identity;
+    
+    // jump landing sound
+    if (!_prevGrounded && _raycastController.collisions.Bottom && _prevVelY < 0.5f) {
+      audioLand.Play();
+    }
+    _prevGrounded = _raycastController.collisions.Bottom;
+    _prevVelY = velY;
   }
 
   public void OnJumpPerformed() {
     if (_raycastController.collisions.Bottom) {
+      audioJump.pitch = _isSmall ? 1.5f : 1.2f;
+      audioJump.Play();
       _rb.velocity = new Vector2(_rb.velocity.x, _maxJumpVelocity);
     }
   }
@@ -102,6 +116,7 @@ public class Player : MonoBehaviour {
       _isSmall = false;
       _accelerationTimeAirborne = accelerationTimeAirborneLarge;
       _accelerationTimeGrounded = accelerationTimeGroundedLarge;
+      audioScale.Play();
     }
   }
 
@@ -115,6 +130,7 @@ public class Player : MonoBehaviour {
       _isSmall = true;
       _accelerationTimeAirborne = accelerationTimeAirborneSmall;
       _accelerationTimeGrounded = accelerationTimeGroundedSmall;
+      audioScale.Play();
     }
   }
 }
