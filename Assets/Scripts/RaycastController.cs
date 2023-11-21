@@ -84,7 +84,7 @@ public class RaycastController : MonoBehaviour {
     collisions.pinchedVertically = collisions.Bottom && collisions.Top;
     collisions.pinchedHorizontally = collisions.Left && collisions.Right;
     collisions.pinched = collisions.pinchedVertically || collisions.pinchedHorizontally;
-    Debug.Log((collisions.Top?"1":"0") + (collisions.Right?"1":"0") + (collisions.Bottom?"1":"0") + (collisions.Left?"1":"0") + (collisions.pinched?"-pinched":""));
+    // Debug.Log((collisions.Top?"1":"0") + (collisions.Right?"1":"0") + (collisions.Bottom?"1":"0") + (collisions.Left?"1":"0") + (collisions.pinched?"-pinched":""));
 
   }
   
