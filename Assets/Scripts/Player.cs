@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -9,6 +10,7 @@ using UnityEngine.Serialization;
 [RequireComponent(typeof(CameraController))]
 public class Player : MonoBehaviour {
 
+  [SerializeField]private bool growEnabled = false;
   [SerializeField]private float speedSmall = 9;
   [SerializeField]private float speedLarge = 10;
   [SerializeField]private float maxJumpVelocitySmall = 26;
@@ -55,6 +57,7 @@ public class Player : MonoBehaviour {
     _maxJumpVelocity = maxJumpVelocitySmall;
     _minJumpVelocity = minJumpVelocitySmall;
     _initialGravityScale = _rb.gravityScale;
+    growEnabled = false;
   }
   
   void Start() { }
@@ -109,7 +112,7 @@ public class Player : MonoBehaviour {
   }
 
   public void OnGrowPerformed() {
-    if (_isSmall) {
+    if (growEnabled && _isSmall) {
       _cameraController.SwitchCamera(1);
       _maxJumpVelocity = maxJumpVelocityLarge;
       _minJumpVelocity = minJumpVelocityLarge;
@@ -123,7 +126,7 @@ public class Player : MonoBehaviour {
   }
 
   public void OnShrinkPerformed() {
-    if (!_isSmall) {
+    if (growEnabled && !_isSmall) {
       _cameraController.SwitchCamera(0);
       _maxJumpVelocity = maxJumpVelocitySmall;
       _minJumpVelocity = minJumpVelocitySmall;
@@ -146,5 +149,16 @@ public class Player : MonoBehaviour {
     _isDashing = true;
     yield return new WaitForSeconds(dashTime);
     _isDashing = false;
+  }
+
+  public void Obtain(string itemName) {
+    switch(itemName) 
+    {
+      case "POWER_GROW":
+        growEnabled = true;
+        break;
+      default:
+        break;
+    }
   }
 }
