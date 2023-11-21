@@ -99,7 +99,7 @@ public class Player : MonoBehaviour {
   }
 
   public void OnJumpPerformed() {
-    if (_raycastController.collisions.Bottom) {
+    if (_raycastController.collisions.Bottom && !_raycastController.collisions.pinched) {
       audioJump.Play();
       _rb.velocity = new Vector2(_rb.velocity.x, _maxJumpVelocity);
     }
