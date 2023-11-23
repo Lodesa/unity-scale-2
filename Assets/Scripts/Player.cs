@@ -44,6 +44,7 @@ public class Player : MonoBehaviour {
   private bool _isScaling;
   private float _scaleSmoothing;
   private float _initialGravityScale;
+  private RigidbodyConstraints2D _initialRBConstraints;
   private float _prevVelY;
   private bool _prevGrounded;
   private bool _isDashing;
@@ -57,12 +58,18 @@ public class Player : MonoBehaviour {
     _maxJumpVelocity = maxJumpVelocitySmall;
     _minJumpVelocity = minJumpVelocitySmall;
     _initialGravityScale = _rb.gravityScale;
+    _initialRBConstraints = _rb.constraints;
     growEnabled = false;
   }
   
   void Start() { }
 
   private void FixedUpdate() {
+    if (!_raycastController.collisions.pinched) {
+      print("not pinched");
+    }
+    
+    
     // movement
     float velY = _rb.velocity.y;
     float velX = Mathf.SmoothDamp(_rb.velocity.x, movementInput.x * (_isDashing ? dashSpeed : _speed), ref _velocityXSmoothing,
@@ -71,9 +78,31 @@ public class Player : MonoBehaviour {
     // scaling
     if (_isScaling) {
       if (!_raycastController.collisions.pinched || _isSmall) {
+        float prevScale = transform.localScale.x;
         float scale = Mathf.SmoothDamp(transform.localScale.x, _isSmall ? 1 : scaleFactor, ref _scaleSmoothing, scaleTime);
-        transform.localScale = new Vector3(scale, scale, 1);
         _isScaling = !(transform.localScale.x >= scaleFactor);
+        transform.localScale = new Vector3(scale, scale, 1);
+
+        // if scaling while colliding with a surface, translate away from that surface a distance equal to increase in size from scaling
+        if (!_isSmall) {
+          float scaleDiff = scale - prevScale;
+          float posXDelta = 0;
+          float posYDelta = 0;
+          if (_raycastController.collisions.Bottom) {
+            posYDelta = scaleDiff / 2;
+          }
+          else if (_raycastController.collisions.Top) {
+            posYDelta = scaleDiff / -2;
+          }
+
+          if (_raycastController.collisions.Right) {
+            posXDelta = scaleDiff / -2;
+          }
+          else if (_raycastController.collisions.Left) {
+            posXDelta = scaleDiff / 2;
+          }
+          transform.position += new Vector3(posXDelta, posYDelta, 0);
+        }
       }
     }
 
@@ -83,12 +112,20 @@ public class Player : MonoBehaviour {
       }
       if (_raycastController.collisions.pinchedHorizontally) {
         velY = 0;
+        
+        // fix for a bug that I don't understand... when pinched horizontally and not grounded player slooowly slides downward
+        _rb.constraints = RigidbodyConstraints2D.FreezePositionY | RigidbodyConstraints2D.FreezeRotation;
       }
+      else {
+        _rb.constraints = _initialRBConstraints;
+      }
+    }
+    else {
+      _rb.constraints = _initialRBConstraints;
     }
 
     _rb.gravityScale = _raycastController.collisions.pinchedHorizontally ? 0 : _initialGravityScale;
     _rb.velocity = new Vector2(velX, velY);    
-    transform.rotation = Quaternion.identity;
     
     // jump landing sound
     if (!_prevGrounded && _raycastController.collisions.Bottom && _prevVelY < 0.5f) {

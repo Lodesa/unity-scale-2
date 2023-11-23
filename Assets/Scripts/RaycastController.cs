@@ -31,7 +31,6 @@ public class RaycastController : MonoBehaviour {
     CalculateRaySpacing();
     collisions.Reset();
     float rayLength = skinWidth * 2;
-    
 
     // check below
     for (int i = 0; i < rayCount; i++) {
