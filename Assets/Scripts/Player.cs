@@ -156,6 +156,9 @@ public class Player : MonoBehaviour {
       _accelerationTimeGrounded = accelerationTimeGroundedLarge;
       audioScale.Play();
     }
+    else {
+      OnShrinkPerformed();
+    }
   }
 
   public void OnShrinkPerformed() {
@@ -169,6 +172,9 @@ public class Player : MonoBehaviour {
       _accelerationTimeAirborne = accelerationTimeAirborneSmall;
       _accelerationTimeGrounded = accelerationTimeGroundedSmall;
       audioScale.Play();
+    }
+    else {
+      OnGrowPerformed();
     }
   }
 
