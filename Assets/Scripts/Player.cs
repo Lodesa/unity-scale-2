@@ -11,6 +11,7 @@ using UnityEngine.Serialization;
 public class Player : MonoBehaviour {
 
   [SerializeField]private bool growEnabled = false;
+  [SerializeField]private bool dashEnabled = false;
   [SerializeField]private float speedSmall = 9;
   [SerializeField]private float speedLarge = 10;
   [SerializeField]private float maxJumpVelocitySmall = 26;
@@ -65,11 +66,6 @@ public class Player : MonoBehaviour {
   void Start() { }
 
   private void FixedUpdate() {
-    if (!_raycastController.collisions.pinched) {
-      print("not pinched");
-    }
-    
-    
     // movement
     float velY = _rb.velocity.y;
     float velX = Mathf.SmoothDamp(_rb.velocity.x, movementInput.x * (_isDashing ? dashSpeed : _speed), ref _velocityXSmoothing,
@@ -177,7 +173,7 @@ public class Player : MonoBehaviour {
   }
 
   public void OnDashPerformed() {
-    if (!_isDashing && _isSmall && _raycastController.collisions.Bottom) {
+    if (dashEnabled && !_isDashing && _isSmall && _raycastController.collisions.Bottom) {
       StartCoroutine(Dash());
     }
   }
