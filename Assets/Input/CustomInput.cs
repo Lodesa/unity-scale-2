@@ -46,18 +46,9 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Grow"",
+                    ""name"": ""ToggleSize"",
                     ""type"": ""Button"",
                     ""id"": ""acf92a21-1942-4079-9717-af7ba7d7971b"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""Shrink"",
-                    ""type"": ""Button"",
-                    ""id"": ""4779d356-671d-4804-bde1-bed05b728295"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -323,47 +314,25 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Grow"",
+                    ""action"": ""ToggleSize"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
                     ""id"": ""b05cb93d-3dd9-46ad-811a-de3d229d05c9"",
-                    ""path"": ""<Gamepad>/buttonNorth"",
+                    ""path"": ""<Gamepad>/buttonWest"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Grow"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""613572ac-95ec-49b1-a11b-bb319eaa95b9"",
-                    ""path"": ""<Keyboard>/o"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Shrink"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""4e67c310-83aa-4784-b6ee-1eba4db4cce9"",
-                    ""path"": ""<Gamepad>/buttonEast"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Shrink"",
+                    ""action"": ""ToggleSize"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
                     ""id"": ""22fb6a39-b199-4c70-a01c-4c539f0edbae"",
-                    ""path"": ""<Gamepad>/buttonWest"",
+                    ""path"": ""<Gamepad>/buttonEast"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -402,8 +371,7 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Movement = m_Player.FindAction("Movement", throwIfNotFound: true);
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
-        m_Player_Grow = m_Player.FindAction("Grow", throwIfNotFound: true);
-        m_Player_Shrink = m_Player.FindAction("Shrink", throwIfNotFound: true);
+        m_Player_ToggleSize = m_Player.FindAction("ToggleSize", throwIfNotFound: true);
         m_Player_Dash = m_Player.FindAction("Dash", throwIfNotFound: true);
     }
 
@@ -468,8 +436,7 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
     private List<IPlayerActions> m_PlayerActionsCallbackInterfaces = new List<IPlayerActions>();
     private readonly InputAction m_Player_Movement;
     private readonly InputAction m_Player_Jump;
-    private readonly InputAction m_Player_Grow;
-    private readonly InputAction m_Player_Shrink;
+    private readonly InputAction m_Player_ToggleSize;
     private readonly InputAction m_Player_Dash;
     public struct PlayerActions
     {
@@ -477,8 +444,7 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
         public PlayerActions(@CustomInput wrapper) { m_Wrapper = wrapper; }
         public InputAction @Movement => m_Wrapper.m_Player_Movement;
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
-        public InputAction @Grow => m_Wrapper.m_Player_Grow;
-        public InputAction @Shrink => m_Wrapper.m_Player_Shrink;
+        public InputAction @ToggleSize => m_Wrapper.m_Player_ToggleSize;
         public InputAction @Dash => m_Wrapper.m_Player_Dash;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
@@ -495,12 +461,9 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
             @Jump.started += instance.OnJump;
             @Jump.performed += instance.OnJump;
             @Jump.canceled += instance.OnJump;
-            @Grow.started += instance.OnGrow;
-            @Grow.performed += instance.OnGrow;
-            @Grow.canceled += instance.OnGrow;
-            @Shrink.started += instance.OnShrink;
-            @Shrink.performed += instance.OnShrink;
-            @Shrink.canceled += instance.OnShrink;
+            @ToggleSize.started += instance.OnToggleSize;
+            @ToggleSize.performed += instance.OnToggleSize;
+            @ToggleSize.canceled += instance.OnToggleSize;
             @Dash.started += instance.OnDash;
             @Dash.performed += instance.OnDash;
             @Dash.canceled += instance.OnDash;
@@ -514,12 +477,9 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
             @Jump.started -= instance.OnJump;
             @Jump.performed -= instance.OnJump;
             @Jump.canceled -= instance.OnJump;
-            @Grow.started -= instance.OnGrow;
-            @Grow.performed -= instance.OnGrow;
-            @Grow.canceled -= instance.OnGrow;
-            @Shrink.started -= instance.OnShrink;
-            @Shrink.performed -= instance.OnShrink;
-            @Shrink.canceled -= instance.OnShrink;
+            @ToggleSize.started -= instance.OnToggleSize;
+            @ToggleSize.performed -= instance.OnToggleSize;
+            @ToggleSize.canceled -= instance.OnToggleSize;
             @Dash.started -= instance.OnDash;
             @Dash.performed -= instance.OnDash;
             @Dash.canceled -= instance.OnDash;
@@ -544,8 +504,7 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
     {
         void OnMovement(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
-        void OnGrow(InputAction.CallbackContext context);
-        void OnShrink(InputAction.CallbackContext context);
+        void OnToggleSize(InputAction.CallbackContext context);
         void OnDash(InputAction.CallbackContext context);
     }
 }
