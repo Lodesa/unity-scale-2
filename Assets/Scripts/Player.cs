@@ -43,7 +43,6 @@ public class Player : MonoBehaviour {
   private float _accelerationTimeAirborne = .1f;
   private float _accelerationTimeGrounded = .04f;  
   private float _velocityXSmoothing;
-  private bool _isSmall;
   private bool _isScaling;
   private float _scaleSmoothing;
   private RigidbodyConstraints2D _initialRBConstraints;
@@ -51,11 +50,14 @@ public class Player : MonoBehaviour {
   private bool _prevGrounded;
   private bool _isDashing;
 
+  [HideInInspector] public bool unstable;
+  [HideInInspector] public bool isSmall;
+  
   void Awake() {
     _rb = GetComponent<Rigidbody2D>();
     _raycastController = GetComponent<RaycastController>();
     _cameraController = GetComponent<CameraController>();
-    _isSmall = true;
+    isSmall = true;
     _speed = speedSmall;
     _maxJumpVelocity = maxJumpVelocitySmall;
     _minJumpVelocity = minJumpVelocitySmall;
@@ -75,7 +77,7 @@ public class Player : MonoBehaviour {
       _raycastController.collisions.Bottom ? _accelerationTimeGrounded : _accelerationTimeAirborne);
     
     // stop movement when pinched
-    if (!_isSmall) {
+    if (!isSmall) {
       if (_raycastController.collisions.pinchedVertically) {
         velX = 0;
       }
@@ -94,7 +96,9 @@ public class Player : MonoBehaviour {
     }
 
     // reduce gravity on downward phase of jump
-    float unpinchedGravityScale = _rb.velocity.y < 0 ? fallingGravityScale : gravityScale;
+    float unpinchedGravityScale = _rb.velocity.y < 0 && !_raycastController.collisions.Bottom
+      ? fallingGravityScale
+      : gravityScale;
     _rb.gravityScale = _raycastController.collisions.pinchedHorizontally ? 0 : unpinchedGravityScale;
     _rb.velocity = new Vector2(velX, velY);    
     
@@ -108,15 +112,15 @@ public class Player : MonoBehaviour {
 
   private void ScaleAndTranslate() {
     if (_isScaling) {
-      if (!_raycastController.collisions.pinched || _isSmall) {
+      if (!_raycastController.collisions.pinched || isSmall) {
         float prevScale = transform.localScale.x;
-        float scale = Mathf.SmoothDamp(transform.localScale.x, _isSmall ? 1 : scaleFactor, ref _scaleSmoothing, scaleTime);
+        float scale = Mathf.SmoothDamp(transform.localScale.x, isSmall ? 1 : scaleFactor, ref _scaleSmoothing, scaleTime);
         float scaleDiff = scale - prevScale;
         transform.localScale = new Vector3(scale, scale, 1);
         _isScaling = !(transform.localScale.x >= scaleFactor);
 
         // if scaling up...
-        if (!_isSmall) {
+        if (!isSmall) {
           
           float posXDelta = 0;
           float posYDelta = 0;
@@ -169,7 +173,17 @@ public class Player : MonoBehaviour {
   public void OnJumpPerformed() {
     if (_raycastController.collisions.Bottom && !_raycastController.collisions.pinched) {
       audioJump.Play();
-      _rb.velocity = new Vector2(_rb.velocity.x, _maxJumpVelocity);
+
+      if (!unstable || isSmall) {
+        _rb.velocity = new Vector2(_rb.velocity.x, _maxJumpVelocity);
+      }
+      else {
+        _rb.velocity = new Vector2(_rb.velocity.x, maxJumpVelocitySmall / 2);
+        if (transform.parent != null && transform.parent.CompareTag("PlatformSinker")) {
+          PlatformSinker platform = transform.parent.GetComponent<PlatformSinker>();
+          platform.sunk = true;
+        }
+      }
     }
   }
 
@@ -181,12 +195,12 @@ public class Player : MonoBehaviour {
 
   public void OnToggleSizePerformed() {
     if (growEnabled) {
-      if (_isSmall) {
+      if (isSmall) {
         _cameraController.SwitchCamera(1);
         _maxJumpVelocity = maxJumpVelocityLarge;
         _minJumpVelocity = minJumpVelocityLarge;
         _speed = speedLarge;
-        _isSmall = false;
+        isSmall = false;
         _accelerationTimeAirborne = accelerationTimeAirborneLarge;
         _accelerationTimeGrounded = accelerationTimeGroundedLarge;
       }
@@ -195,7 +209,7 @@ public class Player : MonoBehaviour {
         _maxJumpVelocity = maxJumpVelocitySmall;
         _minJumpVelocity = minJumpVelocitySmall;
         _speed = speedSmall;
-        _isSmall = true;
+        isSmall = true;
         _accelerationTimeAirborne = accelerationTimeAirborneSmall;
         _accelerationTimeGrounded = accelerationTimeGroundedSmall;
       }
@@ -205,7 +219,7 @@ public class Player : MonoBehaviour {
   }
 
   public void OnDashPerformed() {
-    if (dashEnabled && !_isDashing && _isSmall && _raycastController.collisions.Bottom) {
+    if (dashEnabled && !_isDashing && isSmall && _raycastController.collisions.Bottom) {
       StartCoroutine(Dash());
     }
   }
@@ -216,6 +230,22 @@ public class Player : MonoBehaviour {
     _isDashing = false;
   }
 
+  private void OnCollisionEnter2D(Collision2D other) {
+    if (other.collider.CompareTag("PlatformSinker")) {
+      transform.parent = other.transform;
+      print("parented ");
+    }
+  }
+
+  private void OnCollisionExit2D(Collision2D other) {
+    if (other.collider.CompareTag("PlatformSinker")) {
+      transform.parent = null;
+      print("unparented ");
+    }
+  }
+  
+  
+  
   public void Obtain(string itemName) {
     switch(itemName) 
     {
