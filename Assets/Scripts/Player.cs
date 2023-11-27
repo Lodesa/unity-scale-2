@@ -52,6 +52,7 @@ public class Player : MonoBehaviour {
 
   [HideInInspector] public bool unstable;
   [HideInInspector] public bool isSmall;
+  [HideInInspector] public bool isPinchedHorizontally;
   
   void Awake() {
     _rb = GetComponent<Rigidbody2D>();
@@ -63,7 +64,7 @@ public class Player : MonoBehaviour {
     _minJumpVelocity = minJumpVelocitySmall;
     _initialRBConstraints = _rb.constraints;
     _rb.gravityScale = gravityScale;
-    growEnabled = false;
+    // growEnabled = false;
   }
   
   void Start() { }
@@ -77,12 +78,14 @@ public class Player : MonoBehaviour {
       _raycastController.collisions.Bottom ? _accelerationTimeGrounded : _accelerationTimeAirborne);
     
     // stop movement when pinched
+    isPinchedHorizontally = false;
     if (!isSmall) {
       if (_raycastController.collisions.pinchedVertically) {
         velX = 0;
       }
       if (_raycastController.collisions.pinchedHorizontally) {
         velY = 0;
+        isPinchedHorizontally = true;
         
         // fix for a bug that I don't understand... when pinched horizontally and not grounded player slooowly slides downward
         _rb.constraints = RigidbodyConstraints2D.FreezePositionY | RigidbodyConstraints2D.FreezeRotation;
@@ -243,8 +246,6 @@ public class Player : MonoBehaviour {
       print("unparented ");
     }
   }
-  
-  
   
   public void Obtain(string itemName) {
     switch(itemName) 

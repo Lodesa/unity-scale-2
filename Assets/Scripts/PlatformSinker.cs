@@ -41,20 +41,28 @@ public class PlatformSinker : MonoBehaviour {
   }
 
   private void FixedUpdate() {
-    if (_boarded || sunk) {
-      if (_initialPosition.y - transform.position.y < distanceY) {
-        if (_player) {
-          _player.unstable = true;
-        }
-        transform.position += new Vector3(0, ((_player && !_player.isSmall) || sunk ? -sinkSpeedLarge : -sinkSpeed) * Time.deltaTime, 0);
-      }
-      else {
+    if (sunk) {
+      transform.position += new Vector3(0, -sinkSpeedLarge * Time.deltaTime, 0);
+      if (_initialPosition.y - transform.position.y >= distanceY) {
         if (_player) {
           _player.unstable = false;
         }
         sunk = false;
+      }      
+    }
+    else if (_boarded && _player) {
+      // if the platform hasn't bottomed out
+      if (_initialPosition.y - transform.position.y < distanceY && !_player.isPinchedHorizontally) {
+        _player.unstable = true;
+        transform.position += new Vector3(0, (!_player.isSmall ? -sinkSpeedLarge : -sinkSpeed) * Time.deltaTime, 0);
+      }
+      // if the platform bottomed out, it's no longer unstable
+      else {
+        _player.unstable = false;
+        sunk = false;
       }
     }
+    // if not sunk or boarded by player, start rising up again
     else {
       if (transform.position.y < _initialPosition.y) {
         if (Time.time - _unboardedTime > riseDelay) {
