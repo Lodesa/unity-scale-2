@@ -12,6 +12,7 @@ public class Player : MonoBehaviour {
 
   [SerializeField] private bool growEnabled = false;
   [SerializeField] private bool dashEnabled = false;
+  [SerializeField] private bool climbEnabled = false;
   [SerializeField] private float speedSmall = 9;
   [SerializeField] private float speedLarge = 10;
   [SerializeField] private float maxJumpVelocitySmall = 26;
@@ -180,6 +181,8 @@ public class Player : MonoBehaviour {
       if (!unstable || isSmall) {
         _rb.velocity = new Vector2(_rb.velocity.x, _maxJumpVelocity);
       }
+      
+      // when on sinking platform and large, reduce jump velocity, and completely sink the platform
       else {
         _rb.velocity = new Vector2(_rb.velocity.x, maxJumpVelocitySmall / 2);
         if (transform.parent != null && transform.parent.CompareTag("PlatformSinker")) {
@@ -187,6 +190,12 @@ public class Player : MonoBehaviour {
           platform.sunk = true;
         }
       }
+    }
+    // when horizontally pinched, if climb enabled, shrink and jump up 
+    else if (climbEnabled && _raycastController.collisions.pinchedHorizontally) {
+      audioJump.Play();
+      OnToggleSizePerformed();
+      _rb.velocity = new Vector2(_rb.velocity.x, _maxJumpVelocity);
     }
   }
 
@@ -236,14 +245,12 @@ public class Player : MonoBehaviour {
   private void OnCollisionEnter2D(Collision2D other) {
     if (other.collider.CompareTag("PlatformSinker")) {
       transform.parent = other.transform;
-      print("parented ");
     }
   }
 
   private void OnCollisionExit2D(Collision2D other) {
     if (other.collider.CompareTag("PlatformSinker")) {
       transform.parent = null;
-      print("unparented ");
     }
   }
   
@@ -253,6 +260,9 @@ public class Player : MonoBehaviour {
       case "POWER_GROW":
         growEnabled = true;
         break;
+      case "POWER_CLIMB":
+        climbEnabled = true;
+        break;      
       default:
         break;
     }

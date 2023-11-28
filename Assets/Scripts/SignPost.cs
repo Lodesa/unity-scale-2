@@ -9,8 +9,6 @@ public class SignPost : MonoBehaviour {
   public string message = "default message";
   public TextMeshProUGUI tmp;
   public GameObject canvas;
-      
-  
 
   private void OnTriggerEnter2D(Collider2D other) {
     if (other.CompareTag("Player")) {
