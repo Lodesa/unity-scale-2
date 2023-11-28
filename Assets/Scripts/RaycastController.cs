@@ -58,7 +58,7 @@ public class RaycastController : MonoBehaviour {
     
     // check left
     for (int i = 0; i < rayCount; i++) {
-      Vector2 rayOriginLeft = _raycastOrigins.BottomLeft;
+      Vector2 rayOriginLeft = _raycastOrigins.BottomLeft + Vector2.up * skinWidth;
       rayOriginLeft += Vector2.up * (_raySpacing * i);
       RaycastHit2D hitLeft = Physics2D.Raycast(rayOriginLeft, Vector2.left, rayLength, collisionMask);
       Debug.DrawRay(rayOriginLeft, Vector2.left * rayLength, Color.red);
@@ -70,7 +70,7 @@ public class RaycastController : MonoBehaviour {
     
     // check right
     for (int i = 0; i < rayCount; i++) {
-      Vector2 rayOriginRight = _raycastOrigins.TopRight;
+      Vector2 rayOriginRight = _raycastOrigins.TopRight + Vector2.up * skinWidth;
       rayOriginRight += Vector2.down * (_raySpacing * i);
       RaycastHit2D hitRight = Physics2D.Raycast(rayOriginRight, Vector2.right, rayLength, collisionMask);
       Debug.DrawRay(rayOriginRight, Vector2.right * rayLength, Color.red);

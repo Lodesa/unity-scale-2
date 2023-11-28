@@ -143,6 +143,7 @@ public class Player : MonoBehaviour {
           else if (_raycastController.collisions.Left) {
             posXDelta = scaleDiff / 2;
           }
+          
           transform.position += new Vector3(posXDelta, posYDelta, 0);
         }
         
