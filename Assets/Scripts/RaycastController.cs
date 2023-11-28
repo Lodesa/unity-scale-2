@@ -15,7 +15,6 @@ public class RaycastController : MonoBehaviour {
   private RaycastOrigins _raycastOrigins;
   public Collisions collisions;
   private float _raySpacing;
-  
 
   public virtual void Awake() {
     _collider = GetComponent<BoxCollider2D>();
@@ -31,13 +30,18 @@ public class RaycastController : MonoBehaviour {
     CalculateRaySpacing();
     collisions.Reset();
     float rayLength = skinWidth * 2;
+    Vector2 verticalRayOffset = new Vector2(0, skinWidth);
+    float[] spacing = new float[rayCount];
+    for (int i = 0; i < rayCount; i++) {
+      spacing[i] = _raySpacing * i;
+    }
 
     // check below
     for (int i = 0; i < rayCount; i++) {
       Vector2 rayOriginBottom = _raycastOrigins.BottomLeft;
-      rayOriginBottom += Vector2.right * (_raySpacing * i);
+      rayOriginBottom += Vector2.right * spacing[i];
       RaycastHit2D hitBelow = Physics2D.Raycast(rayOriginBottom, Vector2.down, rayLength, collisionMask);
-      Debug.DrawRay(rayOriginBottom, Vector2.down * rayLength, Color.red);
+      // Debug.DrawRay(rayOriginBottom, Vector2.down * rayLength, Color.red);
       if (hitBelow) {
         collisions.Bottom = true;
         break;
@@ -47,9 +51,9 @@ public class RaycastController : MonoBehaviour {
     // check above
     for (int i = 0; i < rayCount; i++) {
       Vector2 rayOriginTop = _raycastOrigins.TopRight;
-      rayOriginTop += Vector2.left * (_raySpacing * i);
+      rayOriginTop += Vector2.left * spacing[i];
       RaycastHit2D hitAbove = Physics2D.Raycast(rayOriginTop, Vector2.up, rayLength, collisionMask);
-      Debug.DrawRay(rayOriginTop, Vector2.up * rayLength, Color.red);
+      // Debug.DrawRay(rayOriginTop, Vector2.up * rayLength, Color.red);
       if (hitAbove) {
         collisions.Top = true;
         break;
@@ -58,10 +62,10 @@ public class RaycastController : MonoBehaviour {
     
     // check left
     for (int i = 0; i < rayCount; i++) {
-      Vector2 rayOriginLeft = _raycastOrigins.BottomLeft + Vector2.up * skinWidth;
-      rayOriginLeft += Vector2.up * (_raySpacing * i);
+      Vector2 rayOriginLeft = _raycastOrigins.BottomLeft + verticalRayOffset;
+      rayOriginLeft += Vector2.up * spacing[i];
       RaycastHit2D hitLeft = Physics2D.Raycast(rayOriginLeft, Vector2.left, rayLength, collisionMask);
-      Debug.DrawRay(rayOriginLeft, Vector2.left * rayLength, Color.red);
+      // Debug.DrawRay(rayOriginLeft, Vector2.left * rayLength, Color.red);
       if (hitLeft) {
         collisions.Left = true;
         break;
@@ -70,10 +74,10 @@ public class RaycastController : MonoBehaviour {
     
     // check right
     for (int i = 0; i < rayCount; i++) {
-      Vector2 rayOriginRight = _raycastOrigins.TopRight + Vector2.up * skinWidth;
-      rayOriginRight += Vector2.down * (_raySpacing * i);
+      Vector2 rayOriginRight = _raycastOrigins.TopRight + verticalRayOffset;
+      rayOriginRight += Vector2.down * spacing[i];
       RaycastHit2D hitRight = Physics2D.Raycast(rayOriginRight, Vector2.right, rayLength, collisionMask);
-      Debug.DrawRay(rayOriginRight, Vector2.right * rayLength, Color.red);
+      // Debug.DrawRay(rayOriginRight, Vector2.right * rayLength, Color.red);
       if (hitRight) {
         collisions.Right = true;
         break;
