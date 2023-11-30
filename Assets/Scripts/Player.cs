@@ -13,10 +13,9 @@ public class Player : MonoBehaviour {
 
   [SerializeField] private GameObject playerSprite;
   [SerializeField] private GameObject playerSpriteWrapper;
-  [SerializeField] private GameObject playerSpriteRed;
-  [SerializeField] private bool growEnabled = false;
-  [SerializeField] private bool dashEnabled = false;
-  [SerializeField] private bool climbEnabled = false;
+  [SerializeField] public bool growEnabled = false;
+  [SerializeField] public bool dashEnabled = false;
+  [SerializeField] public bool climbEnabled = false;
   [SerializeField] private float speedSmall = 9;
   [SerializeField] private float speedLarge = 10;
   [SerializeField] private float maxJumpVelocitySmall = 26;
@@ -291,9 +290,26 @@ public class Player : MonoBehaviour {
         break;
       case "POWER_CLIMB":
         climbEnabled = true;
+        break;
+      case "POWER_DASH":
+        dashEnabled = true;
         break;      
       default:
         break;
     }
   }
+ 
+  public bool IsEnabled(string powerName) {
+    switch(powerName) 
+    {
+      case "POWER_GROW":
+        return growEnabled;
+      case "POWER_CLIMB":
+        return climbEnabled;
+      case "POWER_DASH":
+        return dashEnabled;
+      default:
+        return false;
+    }
+  }  
 }
