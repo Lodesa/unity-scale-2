@@ -4,12 +4,16 @@ using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(RaycastController))]
 [RequireComponent(typeof(CameraController))]
 public class Player : MonoBehaviour {
 
+  [SerializeField] private GameObject playerSprite;
+  [SerializeField] private GameObject playerSpriteWrapper;
+  [SerializeField] private GameObject playerSpriteRed;
   [SerializeField] private bool growEnabled = false;
   [SerializeField] private bool dashEnabled = false;
   [SerializeField] private bool climbEnabled = false;
@@ -32,9 +36,12 @@ public class Player : MonoBehaviour {
   [SerializeField] private AudioSource audioScale;
   [SerializeField] private float gravityScale = 6;
   [SerializeField] private float fallingGravityScale = 5;
+  [SerializeField] private float blinkMinTime = 1;
+  [SerializeField] private float blinkMaxTime = 12;
   
   [HideInInspector]public Vector2 movementInput;
-  
+
+  private Animator _animator;
   private Rigidbody2D _rb;
   private RaycastController _raycastController;
   private CameraController _cameraController;
@@ -50,6 +57,8 @@ public class Player : MonoBehaviour {
   private float _prevVelY;
   private bool _prevGrounded;
   private bool _isDashing;
+  private PlatformSinker _platformSinker;
+  private float _blinkDelay;
 
   [HideInInspector] public bool unstable;
   [HideInInspector] public bool isSmall;
@@ -65,14 +74,33 @@ public class Player : MonoBehaviour {
     _minJumpVelocity = minJumpVelocitySmall;
     _initialRBConstraints = _rb.constraints;
     _rb.gravityScale = gravityScale;
+    _animator = playerSprite.GetComponent<Animator>();
     // growEnabled = false;
   }
   
-  void Start() { }
+  void Start()
+  {
+    StartCoroutine(Blink());
+  }
 
+  IEnumerator Blink()
+  {
+    while (true) {
+      yield return new WaitForSeconds(Random.Range(blinkMinTime, blinkMaxTime));
+      _animator.Play("Blink");
+    }
+  }
+  
   private void FixedUpdate() {
     ScaleAndTranslate();
     
+    if (movementInput.x > 0) {
+      playerSpriteWrapper.transform.localScale = Vector3.one;
+    }
+    else if (movementInput.x < 0) {
+      playerSpriteWrapper.transform.localScale = new Vector3(-1, 1, 1);
+    }
+
     // movement
     float velY = _rb.velocity.y;
     float velX = Mathf.SmoothDamp(_rb.velocity.x, movementInput.x * (_isDashing ? dashSpeed : _speed), ref _velocityXSmoothing,
@@ -144,7 +172,7 @@ public class Player : MonoBehaviour {
             posXDelta = scaleDiff / 2;
           }
           
-          transform.position += new Vector3(posXDelta, posYDelta, 0);
+          _rb.position += new Vector2(posXDelta, posYDelta);
         }
         
         // if scaling down...
@@ -169,7 +197,7 @@ public class Player : MonoBehaviour {
           else {
             posYDelta = scaleDiff / -2;
           }
-          transform.position += new Vector3(posXDelta, posYDelta, 0);
+          _rb.position += new Vector2(posXDelta, posYDelta);
         }
       }
     }    
@@ -183,12 +211,11 @@ public class Player : MonoBehaviour {
         _rb.velocity = new Vector2(_rb.velocity.x, _maxJumpVelocity);
       }
       
-      // when on sinking platform and large, reduce jump velocity, and completely sink the platform
+      // when on sinking platform and large, reduce jump velocity, and sink the platform
       else {
         _rb.velocity = new Vector2(_rb.velocity.x, maxJumpVelocitySmall / 2);
-        if (transform.parent != null && transform.parent.CompareTag("PlatformSinker")) {
-          PlatformSinker platform = transform.parent.GetComponent<PlatformSinker>();
-          platform.sunk = true;
+        if (_platformSinker != null) {
+          _platformSinker.sunk = true;
         }
       }
     }
@@ -245,13 +272,14 @@ public class Player : MonoBehaviour {
 
   private void OnCollisionEnter2D(Collision2D other) {
     if (other.collider.CompareTag("PlatformSinker")) {
-      transform.parent = other.transform;
+      _rb.velocity = new Vector2(_rb.velocity.x, -9);
+      _platformSinker = other.gameObject.GetComponent<PlatformSinker>();
     }
   }
 
   private void OnCollisionExit2D(Collision2D other) {
     if (other.collider.CompareTag("PlatformSinker")) {
-      transform.parent = null;
+      _platformSinker = null;
     }
   }
   

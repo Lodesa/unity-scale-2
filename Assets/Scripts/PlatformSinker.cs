@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D))]
 public class PlatformSinker : MonoBehaviour {
   [SerializeField] private float sinkSpeed = 1;
   [SerializeField] private float sinkSpeedLarge = 1;
@@ -7,15 +8,16 @@ public class PlatformSinker : MonoBehaviour {
   [SerializeField] private float riseDelay = 3;
   [SerializeField] private float distanceY = 1;
 
-   public bool sunk;
-  
+  public bool sunk;
   private Vector3 _initialPosition;
   private bool _boarded;
   private float _unboardedTime;
   private Player _player;
+  public Rigidbody2D _rb;
 
   void Awake() {
-    _initialPosition = transform.position;
+    _rb = GetComponent<Rigidbody2D>();
+    _initialPosition = _rb.position;
   }
 
   private void OnCollisionEnter2D(Collision2D other) {
@@ -42,8 +44,8 @@ public class PlatformSinker : MonoBehaviour {
 
   private void FixedUpdate() {
     if (sunk) {
-      transform.position += new Vector3(0, -sinkSpeedLarge * Time.deltaTime, 0);
-      if (_initialPosition.y - transform.position.y >= distanceY) {
+      _rb.velocity = new Vector2(0, -sinkSpeedLarge);
+      if (_initialPosition.y - _rb.position.y >= distanceY) {
         if (_player) {
           _player.unstable = false;
         }
@@ -51,26 +53,24 @@ public class PlatformSinker : MonoBehaviour {
       }      
     }
     else if (_boarded && _player) {
-      // if the platform hasn't bottomed out
-      if (_initialPosition.y - transform.position.y < distanceY && !_player.isPinchedHorizontally) {
+      _rb.velocity = Vector2.zero;
+      if (_initialPosition.y - _rb.position.y < distanceY && !_player.isPinchedHorizontally) {
         _player.unstable = true;
-        transform.position += new Vector3(0, (!_player.isSmall ? -sinkSpeedLarge : -sinkSpeed) * Time.deltaTime, 0);
+        _rb.velocity = new Vector2(0, !_player.isSmall ? -sinkSpeedLarge : -sinkSpeed);
       }
-      // if the platform bottomed out, it's no longer unstable
       else {
         _player.unstable = false;
         sunk = false;
       }
     }
-    // if not sunk or boarded by player, start rising up again
     else {
-      if (transform.position.y < _initialPosition.y) {
+      if (_rb.position.y < _initialPosition.y) {
         if (Time.time - _unboardedTime > riseDelay) {
-          transform.position += new Vector3(0, riseSpeed * Time.deltaTime, 0);
+          _rb.velocity = new Vector2(0, riseSpeed);
         }
       }
       else {
-        transform.position = _initialPosition;
+        _rb.MovePosition(_initialPosition);
       }
     }
   }
