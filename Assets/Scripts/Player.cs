@@ -33,6 +33,7 @@ public class Player : MonoBehaviour {
   [SerializeField] private AudioSource audioJump;
   [SerializeField] private AudioSource audioLand;
   [SerializeField] private AudioSource audioScale;
+  [SerializeField] private AudioSource audioDash;
   [SerializeField] private float gravityScale = 6;
   [SerializeField] private float fallingGravityScale = 5;
   [SerializeField] private float blinkMinTime = 1;
@@ -259,6 +260,7 @@ public class Player : MonoBehaviour {
 
   public void OnDashPerformed() {
     if (dashEnabled && !_isDashing && isSmall && _raycastController.collisions.Bottom) {
+      audioDash.Play();
       StartCoroutine(Dash());
     }
   }
