@@ -10,19 +10,21 @@ public class PlayerInput : MonoBehaviour {
   private Player _player = null;
 
   
-  private void Awake() {
+  private void Start() {
     _input = new CustomInput();
     _player = GetComponent<Player>();
   }
 
   private void OnEnable() {
-    _input.Enable();
-    _input.Player.Movement.performed += OnMovementPerformed;
-    _input.Player.Movement.canceled += OnMovementCanceled;
-    _input.Player.Jump.performed += OnJumpPerformed;
-    _input.Player.Jump.canceled += OnJumpCanceled;
-    _input.Player.ToggleSize.performed += OnToggleSizePerformed;
-    _input.Player.Dash.performed += OnDashPerformed;
+    if (_input != null) {
+      _input.Enable();
+      _input.Player.Movement.performed += OnMovementPerformed;
+      _input.Player.Movement.canceled += OnMovementCanceled;
+      _input.Player.Jump.performed += OnJumpPerformed;
+      _input.Player.Jump.canceled += OnJumpCanceled;
+      _input.Player.ToggleSize.performed += OnToggleSizePerformed;
+      _input.Player.Dash.performed += OnDashPerformed;
+    }
   }
 
   private void OnDisable() {

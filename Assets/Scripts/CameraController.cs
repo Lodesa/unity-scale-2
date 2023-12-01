@@ -13,20 +13,18 @@ public class CameraController : MonoBehaviour {
       virtualCameras[i].gameObject.SetActive(index == i);
     }
   }
-
-  public void LookBelow() {
-    print("look below");
-    for (int i = 0; i < virtualCameras.Length; i++) {
-      CinemachineFramingTransposer framing = virtualCameras[i].GetCinemachineComponent<CinemachineFramingTransposer>();
-      framing.m_ScreenY = screenY;
-    }
-  }
-
-  public void LookCenter() {
-    print("look center");
-    for (int i = 0; i < virtualCameras.Length; i++) {
-      CinemachineFramingTransposer framing = virtualCameras[i].GetCinemachineComponent<CinemachineFramingTransposer>();
-      framing.m_ScreenY = 0.5f;
-    }    
-  }
+  
+  // public void LookBelow() {
+  //   for (int i = 0; i < virtualCameras.Length; i++) {
+  //     CinemachineFramingTransposer framing = virtualCameras[i].GetCinemachineComponent<CinemachineFramingTransposer>();
+  //     framing.m_ScreenY = screenY;
+  //   }
+  // }
+  //
+  // public void LookCenter() {
+  //   for (int i = 0; i < virtualCameras.Length; i++) {
+  //     CinemachineFramingTransposer framing = virtualCameras[i].GetCinemachineComponent<CinemachineFramingTransposer>();
+  //     framing.m_ScreenY = 0.5f;
+  //   }    
+  // }
 }
