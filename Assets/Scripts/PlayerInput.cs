@@ -10,7 +10,7 @@ public class PlayerInput : MonoBehaviour {
   private Player _player = null;
 
   
-  private void Start() {
+  private void Awake() {
     _input = new CustomInput();
     _player = GetComponent<Player>();
   }
