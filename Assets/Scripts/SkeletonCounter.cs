@@ -13,7 +13,7 @@ public class SkeletonCounter : MonoBehaviour {
     _found = new Dictionary<string, bool>();
     _skeletonText = GetComponent<TextMeshProUGUI>();
     if (_skeletonText != null) {
-      _skeletonText.text = "0 / 14 skeletons";
+      _skeletonText.text = "0 / 18 skeletons";
     }
   }
   
@@ -21,7 +21,7 @@ public class SkeletonCounter : MonoBehaviour {
     if (skeletonId.Length > 0) {
       _found[skeletonId] = true;
       count = _found.Count;
-      _skeletonText.text = count.ToString() + " / 16 skeletons";
+      _skeletonText.text = count.ToString() + " / 18 skeletons";
     }
   }
 }
