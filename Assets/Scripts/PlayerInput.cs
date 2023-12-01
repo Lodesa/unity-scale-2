@@ -16,14 +16,15 @@ public class PlayerInput : MonoBehaviour {
   }
 
   private void OnEnable() {
-    _input.Enable();
-    _input.Player.Movement.performed += OnMovementPerformed;
-    _input.Player.Movement.canceled += OnMovementCanceled;
-    _input.Player.Jump.performed += OnJumpPerformed;
-    _input.Player.Jump.canceled += OnJumpCanceled;
-    _input.Player.Grow.performed += OnGrowPerformed;
-    _input.Player.Shrink.performed += OnShrinkPerformed;
-    _input.Player.Dash.performed += OnDashPerformed;
+    if (_input != null) {
+      _input.Enable();
+      _input.Player.Movement.performed += OnMovementPerformed;
+      _input.Player.Movement.canceled += OnMovementCanceled;
+      _input.Player.Jump.performed += OnJumpPerformed;
+      _input.Player.Jump.canceled += OnJumpCanceled;
+      _input.Player.ToggleSize.performed += OnToggleSizePerformed;
+      _input.Player.Dash.performed += OnDashPerformed;
+    }
   }
 
   private void OnDisable() {
@@ -48,12 +49,8 @@ public class PlayerInput : MonoBehaviour {
     _player.OnJumpCanceled();
   }
 
-  private void OnGrowPerformed(InputAction.CallbackContext _) {
-    _player.OnGrowPerformed();
-  }
-
-  private void OnShrinkPerformed(InputAction.CallbackContext _) {
-    _player.OnShrinkPerformed();
+  private void OnToggleSizePerformed(InputAction.CallbackContext _) {
+    _player.OnToggleSizePerformed();
   }
   
   private void OnDashPerformed(InputAction.CallbackContext _) {
