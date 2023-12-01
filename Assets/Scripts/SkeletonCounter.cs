@@ -21,7 +21,7 @@ public class SkeletonCounter : MonoBehaviour {
     if (skeletonId.Length > 0) {
       _found[skeletonId] = true;
       count = _found.Count;
-      _skeletonText.text = count.ToString() + " / 14 skeletons";
+      _skeletonText.text = count.ToString() + " / 16 skeletons";
     }
   }
 }

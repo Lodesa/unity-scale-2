@@ -35,8 +35,10 @@ public class PlatformSinker : MonoBehaviour {
   
   private void OnCollisionExit2D(Collision2D other) {
     if (other.collider.CompareTag("Player")) {
-      _player.unstable = false;
-      _player = null;
+      if (_player) {
+        _player.unstable = false;
+        _player = null;
+      }
       _boarded = false;
       _unboardedTime = Time.time;
     }

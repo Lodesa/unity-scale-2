@@ -12,7 +12,7 @@ public class PowerUpText : MonoBehaviour {
     private void OnTriggerEnter2D(Collider2D other) {
         if (other.CompareTag("Player")) {
             _player = other.GetComponent<Player>();
-            if (_player.IsEnabled(power)) {
+            if (_player.IsEnabled(power) && canvas && tmp) {
                 tmp.text = message;
                 canvas.SetActive(true);
             }
@@ -20,14 +20,14 @@ public class PowerUpText : MonoBehaviour {
     }
 
     private void OnTriggerStay2D(Collider2D other) {
-        if (_player != null && _player.IsEnabled(power)) {
+        if (_player != null && _player.IsEnabled(power) && canvas && tmp) {
             tmp.text = message;
             canvas.SetActive(true);
         }
     }
 
     private void OnTriggerExit2D(Collider2D other) {
-        if (other.CompareTag("Player")) {
+        if (other.CompareTag("Player") && canvas && tmp) {
             _player = null;
             tmp.text = "";
             canvas.SetActive(false);
