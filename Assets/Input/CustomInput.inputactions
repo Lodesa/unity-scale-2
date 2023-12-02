@@ -309,6 +309,17 @@
                 },
                 {
                     "name": "",
+                    "id": "ee5a1307-0738-4af6-b31b-d3d943607c75",
+                    "path": "<Keyboard>/w",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ToggleSize",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "22fb6a39-b199-4c70-a01c-4c539f0edbae",
                     "path": "<Gamepad>/buttonEast",
                     "interactions": "",
