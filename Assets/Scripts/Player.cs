@@ -28,7 +28,7 @@ public class Player : MonoBehaviour {
   [SerializeField] private float accelerationTimeGroundedLarge = .09f;
   [SerializeField] private int scaleFactor = 5;
   [SerializeField] private float scaleTime = 0.15f;
-  [SerializeField] private float dashTime = 0.5f;
+  // [SerializeField] private float dashTime = 0.5f;
   [SerializeField] private float dashSpeed = 16;
   [SerializeField] private AudioSource audioJump;
   [SerializeField] private AudioSource audioLand;
@@ -243,6 +243,7 @@ public class Player : MonoBehaviour {
         isSmall = false;
         _accelerationTimeAirborne = accelerationTimeAirborneLarge;
         _accelerationTimeGrounded = accelerationTimeGroundedLarge;
+        OnDashCanceled();
       }
       else {
         _cameraController.SwitchCamera(0);
@@ -259,15 +260,12 @@ public class Player : MonoBehaviour {
   }
 
   public void OnDashPerformed() {
-    if (dashEnabled && !_isDashing && isSmall && _raycastController.collisions.Bottom) {
-      audioDash.Play();
-      StartCoroutine(Dash());
+    if (dashEnabled && !_isDashing && isSmall) {
+      _isDashing = true;
     }
   }
-  
-  IEnumerator Dash() {
-    _isDashing = true;
-    yield return new WaitForSeconds(dashTime);
+
+  public void OnDashCanceled() {
     _isDashing = false;
   }
 

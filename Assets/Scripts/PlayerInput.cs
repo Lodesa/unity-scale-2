@@ -24,6 +24,7 @@ public class PlayerInput : MonoBehaviour {
       _input.Player.Jump.canceled += OnJumpCanceled;
       _input.Player.ToggleSize.performed += OnToggleSizePerformed;
       _input.Player.Dash.performed += OnDashPerformed;
+      _input.Player.Dash.canceled += OnDashCanceled;
     }
   }
 
@@ -55,5 +56,9 @@ public class PlayerInput : MonoBehaviour {
   
   private void OnDashPerformed(InputAction.CallbackContext _) {
     _player.OnDashPerformed();
-  }  
+  }
+  
+  private void OnDashCanceled(InputAction.CallbackContext _) {
+    _player.OnDashCanceled();
+  }    
 }
