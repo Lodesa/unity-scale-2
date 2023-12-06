@@ -16,26 +16,27 @@ public class Player : MonoBehaviour {
   [SerializeField] public bool growEnabled = false;
   [SerializeField] public bool dashEnabled = false;
   [SerializeField] public bool climbEnabled = false;
-  [SerializeField] private float speedSmall = 9;
+  [SerializeField] private float speedSmall = 8.7f;
   [SerializeField] private float speedLarge = 10;
-  [SerializeField] private float maxJumpVelocitySmall = 26;
-  [SerializeField] private float maxJumpVelocityLarge = 40;
+  [SerializeField] private float maxJumpVelocitySmall = 27;
+  [SerializeField] private float maxJumpVelocityLarge = 40.9f;
   [SerializeField] private float minJumpVelocitySmall = 5;
   [SerializeField] private float minJumpVelocityLarge = 10;
-  [SerializeField] private float accelerationTimeAirborneSmall = .1f;
-  [SerializeField] private float accelerationTimeAirborneLarge = .2f;
+  [SerializeField] private float accelerationTimeAirborneSmall = .08f;
+  [SerializeField] private float accelerationTimeAirborneLarge = .18f;
   [SerializeField] private float accelerationTimeGroundedSmall = .04f;
-  [SerializeField] private float accelerationTimeGroundedLarge = .09f;
+  [SerializeField] private float accelerationTimeGroundedLarge = .18f;
   [SerializeField] private int scaleFactor = 5;
   [SerializeField] private float scaleTime = 0.15f;
-  // [SerializeField] private float dashTime = 0.5f;
   [SerializeField] private float dashSpeed = 16;
+  [SerializeField] private float groundedGraceTime = 0.092f;
+  [SerializeField] private int maxJumpCount = 1;
   [SerializeField] private AudioSource audioJump;
   [SerializeField] private AudioSource audioLand;
   [SerializeField] private AudioSource audioScale;
   [SerializeField] private AudioSource audioDash;
   [SerializeField] private float gravityScale = 6;
-  [SerializeField] private float fallingGravityScale = 5;
+  [SerializeField] private float fallingGravityScale = 4.7f;
   [SerializeField] private float blinkMinTime = 1;
   [SerializeField] private float blinkMaxTime = 12;
   
@@ -59,6 +60,7 @@ public class Player : MonoBehaviour {
   private bool _isDashing;
   private PlatformSinker _platformSinker;
   private float _blinkDelay;
+  private float _lastGroundedTime;
 
   [HideInInspector] public bool unstable;
   [HideInInspector] public bool isSmall;
@@ -90,9 +92,17 @@ public class Player : MonoBehaviour {
       _animator.Play("Blink");
     }
   }
+
+  private void Update() {
+
+  }
   
   private void FixedUpdate() {
     ScaleAndTranslate();
+
+    if (_raycastController.collisions.Bottom) {
+      _lastGroundedTime = Time.time;
+    }
     
     if (movementInput.x > 0) {
       playerSpriteWrapper.transform.localScale = Vector3.one;
@@ -204,9 +214,9 @@ public class Player : MonoBehaviour {
   }
 
   public void OnJumpPerformed() {
-    if (_raycastController.collisions.Bottom && !_raycastController.collisions.pinched) {
+    if (Time.time - _lastGroundedTime < groundedGraceTime && !_raycastController.collisions.pinched) {
+      _lastGroundedTime = 0;
       audioJump.Play();
-
       if (!unstable || isSmall) {
         _rb.velocity = new Vector2(_rb.velocity.x, _maxJumpVelocity);
       }
