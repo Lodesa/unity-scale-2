@@ -77,6 +77,8 @@ public class Player : MonoBehaviour {
     _initialRBConstraints = _rb.constraints;
     _rb.gravityScale = gravityScale;
     _animator = playerSprite.GetComponent<Animator>();
+    QualitySettings.vSyncCount = 0;
+    Application.targetFrameRate = 90;
     // growEnabled = false;
   }
   
