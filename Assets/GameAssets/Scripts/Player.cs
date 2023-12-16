@@ -30,7 +30,7 @@ public class Player : MonoBehaviour {
   [SerializeField] private float scaleTime = 0.15f;
   [SerializeField] private float dashSpeed = 16;
   [SerializeField] private float groundedGraceTime = 0.092f;
-  [SerializeField] private int maxJumpCount = 1;
+  // [SerializeField] private int maxJumpCount = 1;
   [SerializeField] private AudioSource audioJump;
   [SerializeField] private AudioSource audioLand;
   [SerializeField] private AudioSource audioScale;
